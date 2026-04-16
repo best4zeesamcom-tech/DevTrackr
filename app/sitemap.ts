@@ -30,11 +30,6 @@ export default function sitemap() {
       changeFrequency: "weekly",
       priority: 0.7,
     },
-    {
-      url: "https://devtrackr.vercel.app/roadmap/devops",
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
+    
   ];
 }
