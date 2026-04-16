@@ -12,6 +12,29 @@ export default function sitemap() {
       changeFrequency: "monthly",
       priority: 0.8,
     },
-   
+    {
+      url: "https://devtrackr.vercel.app/roadmap/frontend",
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
+      url: "https://devtrackr.vercel.app/roadmap/backend",
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
+      url: "https://devtrackr.vercel.app/roadmap/fullstack",
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
+      url: "https://devtrackr.vercel.app/roadmap/devops",
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
   ];
 }
