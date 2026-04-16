@@ -12,6 +12,6 @@ export default function sitemap() {
       changeFrequency: "monthly",
       priority: 0.8,
     },
-    // REMOVE the /analyze entry if it exists!
+   
   ];
 }
