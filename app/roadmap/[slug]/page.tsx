@@ -37,34 +37,17 @@ const roadmapData: Record<string, RoadmapData> = {
     projects: ["Dockerized App", "K8s Cluster", "CI/CD Pipeline", "Infrastructure as Code"],
     resources: ["DevOps Roadmap", "Kubernetes Docs", "AWS Training", "Terraform Docs"],
   },
-  default: {
+};
+
+// Default export for the page component
+export default function RoadmapPage({ params }: { params: { slug: string } }) {
+  const data = roadmapData[params.slug] || {
     title: "Developer Roadmap",
     description: "Personalized learning path for you",
     skills: ["JavaScript", "React", "Node.js", "Database", "Git", "Testing"],
     projects: ["Build a REST API", "Create a Frontend App", "Full Stack Project", "Deploy to Cloud"],
     resources: ["FreeCodeCamp", "Codecademy", "Udemy", "YouTube Tutorials"],
-  },
-};
-
-export async function generateStaticParams() {
-  return [
-    { slug: "frontend" },
-    { slug: "backend" },
-    { slug: "fullstack" },
-    { slug: "devops" },
-  ];
-}
-
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const data = roadmapData[params.slug] || roadmapData.default;
-  return {
-    title: `${data.title} | DevTrackr`,
-    description: data.description,
   };
-}
-
-export default function RoadmapPage({ params }: { params: { slug: string } }) {
-  const data = roadmapData[params.slug] || roadmapData.default;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] to-[#E0E7FF] py-12 px-4">
@@ -92,7 +75,7 @@ export default function RoadmapPage({ params }: { params: { slug: string } }) {
             Skills to Learn
           </h2>
           <div className="flex flex-wrap gap-2">
-            {data.skills.map((skill) => (
+            {data.skills.map((skill: string) => (
               <span
                 key={skill}
                 className="bg-gradient-to-r from-blue-50 to-indigo-50 text-[#3B82F6] px-3 py-1 rounded-full text-sm font-medium border border-[#CBD5F5]"
@@ -110,7 +93,7 @@ export default function RoadmapPage({ params }: { params: { slug: string } }) {
             Portfolio Projects
           </h2>
           <div className="grid md:grid-cols-2 gap-3">
-            {data.projects.map((project) => (
+            {data.projects.map((project: string) => (
               <div
                 key={project}
                 className="border border-[#E0E7FF] rounded-lg p-3 hover:shadow-md transition bg-white"
@@ -128,7 +111,7 @@ export default function RoadmapPage({ params }: { params: { slug: string } }) {
             Learning Resources
           </h2>
           <div className="flex flex-wrap gap-2">
-            {data.resources.map((resource) => (
+            {data.resources.map((resource: string) => (
               <span
                 key={resource}
                 className="bg-gray-100 text-[#6B7280] px-3 py-1 rounded-full text-sm"
