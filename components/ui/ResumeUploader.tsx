@@ -46,41 +46,46 @@ export default function ResumeUploader() {
     return interval;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file) return;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!file) return;
 
-    setLoading(true);
-    const progressInterval = simulateProgress();
-    
-    // Simulate API call - Replace with actual backend
+  setLoading(true);
+  const progressInterval = simulateProgress();
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("/api/parse-resume", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await res.json();
+console.log("API RESULT:", result);
+    clearInterval(progressInterval);
+    setUploadProgress(100);
+
+    const analysisData = {
+      resumeText: result.text, // 👈 ADD THIS
+      currentSkills: ["JavaScript", "HTML", "CSS"],
+      missingSkills: ["React", "Node.js"],
+      learningRoadmap: [],
+      portfolioProjects: [],
+      interviewTopics: [],
+      recommendedRoles: [],
+    };
+
+    localStorage.setItem("devtrackr_analysis", JSON.stringify(analysisData));
+
     setTimeout(() => {
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-      
-      const analysisData = {
-        currentSkills: ["JavaScript", "HTML", "CSS", "Git"],
-        missingSkills: ["React", "Node.js", "TypeScript", "Next.js"],
-        learningRoadmap: [
-          { skill: "React", priority: "High", why: "Most in-demand framework", timeEstimate: "3 weeks" },
-          { skill: "Node.js", priority: "High", why: "Backend opportunities", timeEstimate: "4 weeks" },
-          { skill: "TypeScript", priority: "Medium", why: "Industry standard", timeEstimate: "2 weeks" }
-        ],
-        portfolioProjects: [
-          { name: "Task Management App", description: "Full-stack app with authentication", techStack: ["React", "Node.js"] },
-          { name: "Portfolio Website", description: "Showcase your work", techStack: ["Next.js", "Tailwind"] }
-        ],
-        interviewTopics: ["JavaScript Closures", "React Hooks", "System Design Basics"],
-        recommendedRoles: ["Frontend Developer", "React Developer", "Junior Full Stack"]
-      };
-      
-      localStorage.setItem("devtrackr_analysis", JSON.stringify(analysisData));
-      
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 500);
-    }, 2000);
-  };
+      router.push("/dashboard");
+    }, 500);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   return (
   <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] to-[#E0E7FF] flex items-center justify-center px-4">
