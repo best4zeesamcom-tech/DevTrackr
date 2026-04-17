@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ProgressBar from "@/components/ui/ProgressBar";
 
 interface AnalysisData {
+  resumeText?: string;
   currentSkills: string[];
   missingSkills: string[];
   learningRoadmap: Array<{
@@ -98,7 +99,19 @@ export default function Dashboard() {
           </div>
           <p className="text-sm mt-2 text-white/90">Keep learning! You're making great progress.</p>
         </div>
+{/* Resume Content */}
+{data.resumeText && (
+  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-[#E0E7FF] mb-6">
+    <h2 className="text-xl font-bold text-[#111827] mb-3 flex items-center gap-2">
+      <span>📄</span>
+      <span>Your Resume Text</span>
+    </h2>
 
+    <div className="max-h-64 overflow-y-auto text-sm text-[#374151] whitespace-pre-line bg-gray-50 p-4 rounded-lg">
+      {data.resumeText}
+    </div>
+  </div>
+)}
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left Column - Skills */}
           <div className="lg:col-span-2 space-y-6">
