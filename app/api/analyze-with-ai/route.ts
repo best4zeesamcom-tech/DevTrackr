@@ -76,13 +76,11 @@ Return EXACTLY this JSON structure:
     const generatedText = data.choices[0]?.message?.content || "{}";
     console.log("✅ Groq Response received, length:", generatedText.length);
     
-    // Clean the response (remove markdown code blocks)
     let cleanJson = generatedText;
     cleanJson = cleanJson.replace(/```json\n?/g, "");
     cleanJson = cleanJson.replace(/```\n?/g, "");
     cleanJson = cleanJson.trim();
     
-    // Find JSON object in the text if there's extra content
     const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       cleanJson = jsonMatch[0];
@@ -90,7 +88,6 @@ Return EXACTLY this JSON structure:
     
     const analysis = JSON.parse(cleanJson);
     
-    // Ensure all required fields exist
     return NextResponse.json({
       currentSkills: analysis.currentSkills || [],
       missingSkills: analysis.missingSkills || [],
@@ -107,9 +104,26 @@ Return EXACTLY this JSON structure:
 }
 
 // Fallback analysis when API fails
-function getFallbackAnalysis(resumeText: string) {
+function getFallbackAnalysis(resumeText: string): {
+  currentSkills: string[];
+  missingSkills: string[];
+  learningRoadmap: Array<{
+    skill: string;
+    priority: string;
+    why: string;
+    timeEstimate: string;
+    resources: string[];
+  }>;
+  portfolioProjects: Array<{
+    name: string;
+    description: string;
+    techStack: string[];
+  }>;
+  interviewTopics: string[];
+  recommendedRoles: string[];
+} {
   const lowerText = resumeText.toLowerCase();
-  const detectedSkills = [];
+  const detectedSkills: string[] = [];  // ← FIXED: Added explicit type
   
   const skills = ["JavaScript", "React", "Node.js", "Python", "HTML", "CSS", "Git", "MongoDB", "TypeScript", "Next.js"];
   
@@ -119,8 +133,8 @@ function getFallbackAnalysis(resumeText: string) {
     }
   }
   
-  const currentSkills = detectedSkills.length > 0 ? detectedSkills : ["Web Development"];
-  const missingSkills = skills.filter(s => !detectedSkills.includes(s)).slice(0, 5);
+  const currentSkills: string[] = detectedSkills.length > 0 ? detectedSkills : ["Web Development"];
+  const missingSkills: string[] = skills.filter(s => !detectedSkills.includes(s)).slice(0, 5);
   
   return {
     currentSkills: currentSkills,
