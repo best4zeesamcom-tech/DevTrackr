@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-
+//AIzaSyDsqpIg8Puf9niFVAHs0Si_pOETLD28zMQ
 export default function ResumeUploader() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,33 +57,44 @@ const handleSubmit = async (e: React.FormEvent) => {
     const formData = new FormData();
     formData.append("file", file);
 
+    // Step 1: Extract text from PDF
     const res = await fetch("/api/parse-resume", {
       method: "POST",
       body: formData,
     });
 
     const result = await res.json();
-console.log("API RESULT:", result);
-    clearInterval(progressInterval);
-    setUploadProgress(100);
-
+    const resumeText = result.text || "";
+    
+    // Step 2: Send to OpenAI for REAL analysis
+    const aiResponse = await fetch("/api/analyze-with-ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resumeText }),
+    });
+    
+    const analysis = await aiResponse.json();
+    
+    // Step 3: Save AI-generated analysis
     const analysisData = {
-      resumeText: result.text, // 👈 ADD THIS
-      currentSkills: ["JavaScript", "HTML", "CSS"],
-      missingSkills: ["React", "Node.js"],
-      learningRoadmap: [],
-      portfolioProjects: [],
-      interviewTopics: [],
-      recommendedRoles: [],
+      resumeText: resumeText,
+      currentSkills: analysis.currentSkills,
+      missingSkills: analysis.missingSkills,
+      learningRoadmap: analysis.learningRoadmap,
+      portfolioProjects: analysis.portfolioProjects,
+      interviewTopics: analysis.interviewTopics,
+      recommendedRoles: analysis.recommendedRoles,
     };
-
+    
     localStorage.setItem("devtrackr_analysis", JSON.stringify(analysisData));
-
+    
     setTimeout(() => {
       router.push("/dashboard");
     }, 500);
+    
   } catch (err) {
     console.error(err);
+    setLoading(false);
   }
 };
 
