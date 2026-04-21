@@ -107,6 +107,7 @@ Return EXACTLY this JSON structure:
 function getFallbackAnalysis(resumeText: string): {
   currentSkills: string[];
   missingSkills: string[];
+  
   learningRoadmap: Array<{
     skill: string;
     priority: string;
