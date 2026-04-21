@@ -264,46 +264,45 @@ export default function Dashboard() {
           )}
 
           {/* LEARNING ROADMAP TAB */}
-          {activeTab === "roadmap" && (
-            <>
-              <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                <h3 className="font-medium text-gray-900 mb-4">📚 Your Learning Roadmap</h3>
-                <div className="space-y-4">
-                  {data.learningRoadmap?.map(item => (
-                    <ProgressBar
-                      key={item.skill}
-                      skill={item.skill}
-                      progress={progress[item.skill] || 0}
-                      onUpdate={updateProgress}
-                      priority={item.priority}
-                      why={item.why}
-                      timeEstimate={item.timeEstimate}
-                      resources={item.resources}
-                    />
-                  ))}
-                </div>
-              </div>
+{activeTab === "roadmap" && (
+  <>
+    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+      <h3 className="font-medium text-gray-900 mb-4">📚 Your Learning Roadmap</h3>
+      <div className="space-y-4">
+        {data.learningRoadmap?.map(item => (
+          <ProgressBar
+            key={item.skill}
+            skill={item.skill}
+            progress={progress[item.skill] || 0}
+            onUpdate={updateProgress}
+            priority={item.priority}
+            why={item.why}
+            timeEstimate={item.timeEstimate}
+            resources={item.resources}
+          />
+        ))}
+      </div>
+    </div>
 
-              <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                <h3 className="font-medium text-gray-900 mb-4">🎓 Recommended Learning Path</h3>
-                <div className="space-y-3">
-                  {data.learningRoadmap?.map((item, idx) => (
-                    <SkillRecommendationCard 
-                      key={idx} 
-                      recommendation={{
-                        skill: item.skill,
-                        priority: item.priority as 'High' | 'Medium' | 'Low',
-                        why: item.why,
-                        timeEstimate: item.timeEstimate,
-                        resources: item.resources
-                      }} 
-                    />
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-
+    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+      <h3 className="font-medium text-gray-900 mb-4">🎓 Recommended Learning Path</h3>
+      <div className="space-y-3">
+        {data.learningRoadmap?.map((item, idx) => (
+          <SkillRecommendationCard 
+            key={idx} 
+            recommendation={{
+              skill: item.skill,
+              priority: item.priority as 'High' | 'Medium' | 'Low',
+              why: item.why,
+              timeEstimate: item.timeEstimate,
+              resources: item.resources
+            }} 
+          />
+        ))}
+      </div>
+    </div>
+  </>
+)}
           {/* INSIGHTS TAB */}
           {activeTab === "insights" && (
             <>
