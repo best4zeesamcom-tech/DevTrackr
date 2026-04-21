@@ -8,24 +8,24 @@ export async function POST(req: NextRequest) {
     console.log("📄 Resume text length:", resumeText?.length || 0);
 
     if (!apiKey) {
-      console.error("❌ GROQ_API_KEY not found. Get one from https://console.groq.com");
+      console.error("❌ GROQ_API_KEY not found");
       return NextResponse.json(getFallbackAnalysis(resumeText));
     }
 
-    const prompt = `You are a career advisor for software engineers. Analyze this resume and return ONLY valid JSON. No markdown, no explanations, no extra text.
+    const prompt = `You are a career advisor. Analyze this resume and return ONLY valid JSON.
 
 RESUME:
 ${resumeText.substring(0, 3000)}
 
-Return EXACTLY this JSON structure:
+Return EXACTLY this JSON:
 {
-  "currentSkills": ["skill1", "skill2", "skill3"],
-  "missingSkills": ["skill4", "skill5", "skill6"],
+  "currentSkills": ["skill1", "skill2"],
+  "missingSkills": ["skill3", "skill4"],
   "learningRoadmap": [
     {
       "skill": "skill name",
       "priority": "High",
-      "why": "specific reason based on their resume",
+      "why": "reason",
       "timeEstimate": "X weeks",
       "resources": ["resource1", "resource2"]
     }
@@ -37,11 +37,9 @@ Return EXACTLY this JSON structure:
       "techStack": ["tech1", "tech2"]
     }
   ],
-  "interviewTopics": ["topic1", "topic2", "topic3"],
+  "interviewTopics": ["topic1", "topic2"],
   "recommendedRoles": ["role1", "role2"]
 }`;
-
-    console.log("🤖 Sending to Groq API...");
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -51,16 +49,7 @@ Return EXACTLY this JSON structure:
       },
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
-        messages: [
-          {
-            role: "system",
-            content: "You are a career advisor. Return ONLY valid JSON. No markdown, no explanations."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
+        messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
         max_tokens: 2000
       })
@@ -69,22 +58,13 @@ Return EXACTLY this JSON structure:
     const data = await response.json();
 
     if (data.error) {
-      console.error("❌ Groq API Error:", data.error);
       return NextResponse.json(getFallbackAnalysis(resumeText));
     }
 
     const generatedText = data.choices[0]?.message?.content || "{}";
-    console.log("✅ Groq Response received, length:", generatedText.length);
-    
-    let cleanJson = generatedText;
-    cleanJson = cleanJson.replace(/```json\n?/g, "");
-    cleanJson = cleanJson.replace(/```\n?/g, "");
-    cleanJson = cleanJson.trim();
-    
+    let cleanJson = generatedText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      cleanJson = jsonMatch[0];
-    }
+    if (jsonMatch) cleanJson = jsonMatch[0];
     
     const analysis = JSON.parse(cleanJson);
     
@@ -98,44 +78,24 @@ Return EXACTLY this JSON structure:
     });
     
   } catch (error) {
-    console.error("❌ Analysis Error:", error);
     return NextResponse.json(getFallbackAnalysis(""));
   }
 }
 
-// Fallback analysis when API fails
-function getFallbackAnalysis(resumeText: string): {
-  currentSkills: string[];
-  missingSkills: string[];
-  
-  learningRoadmap: Array<{
-    skill: string;
-    priority: string;
-    why: string;
-    timeEstimate: string;
-    resources: string[];
-  }>;
-  portfolioProjects: Array<{
-    name: string;
-    description: string;
-    techStack: string[];
-  }>;
-  interviewTopics: string[];
-  recommendedRoles: string[];
-} {
+function getFallbackAnalysis(resumeText: string) {
   const lowerText = resumeText.toLowerCase();
-  const detectedSkills: string[] = [];  // ← FIXED: Added explicit type
+  const detectedSkills: string[] = [];
   
-  const skills = ["JavaScript", "React", "Node.js", "Python", "HTML", "CSS", "Git", "MongoDB", "TypeScript", "Next.js"];
+  const allSkills = ["JavaScript", "React", "Node.js", "Python", "HTML", "CSS", "Git", "MongoDB", "TypeScript", "Next.js"];
   
-  for (const skill of skills) {
+  for (const skill of allSkills) {
     if (lowerText.includes(skill.toLowerCase())) {
       detectedSkills.push(skill);
     }
   }
   
-  const currentSkills: string[] = detectedSkills.length > 0 ? detectedSkills : ["Web Development"];
-  const missingSkills: string[] = skills.filter(s => !detectedSkills.includes(s)).slice(0, 5);
+  const currentSkills = detectedSkills.length > 0 ? detectedSkills : ["Web Development"];
+  const missingSkills = allSkills.filter(s => !detectedSkills.includes(s)).slice(0, 5);
   
   return {
     currentSkills: currentSkills,
@@ -143,16 +103,16 @@ function getFallbackAnalysis(resumeText: string): {
     learningRoadmap: missingSkills.slice(0, 3).map((skill, i) => ({
       skill: skill,
       priority: i === 0 ? "High" : "Medium",
-      why: `${skill} is in high demand and will complement your ${currentSkills[0]} experience.`,
+      why: `${skill} complements your ${currentSkills[0]} skills`,
       timeEstimate: i === 0 ? "3-4 weeks" : "2-3 weeks",
-      resources: [`Official ${skill} Documentation`, `${skill} Crash Course on YouTube`, `Build a project with ${skill}`]
+      resources: [`${skill} Docs`, `${skill} Course`]
     })),
     portfolioProjects: missingSkills.slice(0, 2).map((skill, i) => ({
-      name: i === 0 ? `${skill} Dashboard App` : `${skill} Portfolio Project`,
-      description: `Build a production-ready application using ${skill} to showcase to employers.`,
-      techStack: [skill, ...currentSkills.slice(0, 2)]
+      name: i === 0 ? `${skill} App` : `${skill} Project`,
+      description: `Build an app with ${skill}`,
+      techStack: [skill]
     })),
-    interviewTopics: missingSkills.slice(0, 3).map(skill => `${skill} interview questions and answers`),
-    recommendedRoles: currentSkills.includes("React") ? ["Frontend Developer", "Full Stack Developer"] : ["Web Developer", "Software Engineer"]
+    interviewTopics: missingSkills.slice(0, 3).map(skill => `${skill} questions`),
+    recommendedRoles: ["Web Developer", "Software Engineer"]
   };
 }
