@@ -97,7 +97,6 @@ export default function Dashboard() {
               <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
               <p className="text-gray-500 mt-1">Track your learning progress and career growth</p>
             </div>
-           
           </div>
         </div>
 
@@ -289,7 +288,16 @@ export default function Dashboard() {
                 <h3 className="font-medium text-gray-900 mb-4">🎓 Recommended Learning Path</h3>
                 <div className="space-y-3">
                   {data.learningRoadmap?.map((item, idx) => (
-                    <SkillRecommendationCard key={idx} recommendation={item} />
+                    <SkillRecommendationCard 
+                      key={idx} 
+                      recommendation={{
+                        skill: item.skill,
+                        priority: item.priority as 'High' | 'Medium' | 'Low',
+                        why: item.why,
+                        timeEstimate: item.timeEstimate,
+                        resources: item.resources
+                      }} 
+                    />
                   ))}
                 </div>
               </div>
