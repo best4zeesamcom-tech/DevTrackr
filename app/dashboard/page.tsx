@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import ProgressBar from "@/components/ui/ProgressBar";
-import SkillRadarChart from "@/components/ui/SkillRadarChart";
-import SkillGapChart from "@/components/ui/SkillGapChart";
 import SkillRecommendationCard from "@/components/ui/SkillRecommendationCard";
+import AIChatInterface from "@/components/ui/AIChatInterface";
 
 interface AnalysisData {
+  
+  userName?: string;
   resumeText?: string;
   currentSkills: string[];
   missingSkills: string[];
@@ -69,18 +70,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  const radarData = data.missingSkills?.slice(0, 6).map(skill => ({
-    skill: skill,
-    current: 0,
-    required: 85,
-  })) || [];
-
-  const gapData = data.learningRoadmap?.map(item => ({
-    skill: item.skill,
-    gap: item.priority === "High" ? 85 : item.priority === "Medium" ? 60 : 40,
-    priority: item.priority,
-  })) || [];
 
   const totalProgress = Object.values(progress).reduce((a, b) => a + b, 0);
   const averageProgress = data.missingSkills?.length > 0 ? totalProgress / data.missingSkills.length : 0;
@@ -177,7 +166,7 @@ export default function Dashboard() {
 
         {/* Tab Content */}
         <div className="space-y-6">
-          {/* OVERVIEW TAB */}
+          {/* OVERVIEW TAB - NOW WITH AI CHAT INSTEAD OF CHARTS */}
           {activeTab === "overview" && (
             <>
               {/* Progress Bar Card */}
@@ -195,23 +184,17 @@ export default function Dashboard() {
                 <p className="text-xs text-gray-400 mt-2">Keep going! You're making progress.</p>
               </div>
 
-              {/* Two Column Layout */}
-              <div className="grid lg:grid-cols-2 gap-6">
-                {/* Skill Radar */}
-                <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                  <h3 className="font-medium text-gray-900 mb-4">Skill Gap Analysis</h3>
-                  <SkillRadarChart data={radarData} />
-                  <p className="text-center text-xs text-gray-400 mt-3">Your skills vs market demand</p>
-                </div>
+              {/* AI Chat Interface - Replaces all charts */}
+              <AIChatInterface 
+                resumeText={data.resumeText || ""}
+                currentSkills={data.currentSkills}
+                missingSkills={data.missingSkills}
+                recommendedRoles={data.recommendedRoles}
+               
+                userName={data.userName}
+              />
 
-                {/* Skill Gap Chart */}
-                <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                  <h3 className="font-medium text-gray-900 mb-4">Priority Skills</h3>
-                  <SkillGapChart data={gapData} />
-                </div>
-              </div>
-
-              {/* Current Skills */}
+              {/* Current Skills (simplified) */}
               <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
                 <h3 className="font-medium text-gray-900 mb-3">Your Current Skills</h3>
                 <div className="flex flex-wrap gap-2">
@@ -257,52 +240,65 @@ export default function Dashboard() {
               </div>
 
               <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                <h3 className="font-medium text-gray-900 mb-4">📊 Skill Gap Analysis</h3>
-                <SkillGapChart data={gapData} />
+                <h3 className="font-medium text-gray-900 mb-4">📊 Skill Gap Summary</h3>
+                <div className="space-y-3">
+                  {data.missingSkills?.slice(0, 6).map((skill, idx) => (
+                    <div key={skill}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>{skill}</span>
+                        <span className="text-red-600">85% gap</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-red-500 h-2 rounded-full" style={{ width: "85%" }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </>
           )}
 
           {/* LEARNING ROADMAP TAB */}
-{activeTab === "roadmap" && (
-  <>
-    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-      <h3 className="font-medium text-gray-900 mb-4">📚 Your Learning Roadmap</h3>
-      <div className="space-y-4">
-        {data.learningRoadmap?.map(item => (
-          <ProgressBar
-            key={item.skill}
-            skill={item.skill}
-            progress={progress[item.skill] || 0}
-            onUpdate={updateProgress}
-            priority={item.priority}
-            why={item.why}
-            timeEstimate={item.timeEstimate}
-            resources={item.resources}
-          />
-        ))}
-      </div>
-    </div>
+          {activeTab === "roadmap" && (
+            <>
+              <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+                <h3 className="font-medium text-gray-900 mb-4">📚 Your Learning Roadmap</h3>
+                <div className="space-y-4">
+                  {data.learningRoadmap?.map(item => (
+                    <ProgressBar
+                      key={item.skill}
+                      skill={item.skill}
+                      progress={progress[item.skill] || 0}
+                      onUpdate={updateProgress}
+                      priority={item.priority}
+                      why={item.why}
+                      timeEstimate={item.timeEstimate}
+                      resources={item.resources}
+                    />
+                  ))}
+                </div>
+              </div>
 
-    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-      <h3 className="font-medium text-gray-900 mb-4">🎓 Recommended Learning Path</h3>
-      <div className="space-y-3">
-        {data.learningRoadmap?.map((item, idx) => (
-          <SkillRecommendationCard 
-            key={idx} 
-            recommendation={{
-              skill: item.skill,
-              priority: item.priority as 'High' | 'Medium' | 'Low',
-              why: item.why,
-              timeEstimate: item.timeEstimate,
-              resources: item.resources
-            }} 
-          />
-        ))}
-      </div>
-    </div>
-  </>
-)}
+              <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+                <h3 className="font-medium text-gray-900 mb-4">🎓 Recommended Learning Path</h3>
+                <div className="space-y-3">
+                  {data.learningRoadmap?.map((item, idx) => (
+                    <SkillRecommendationCard 
+                      key={idx} 
+                      recommendation={{
+                        skill: item.skill,
+                        priority: item.priority as 'High' | 'Medium' | 'Low',
+                        why: item.why,
+                        timeEstimate: item.timeEstimate,
+                        resources: item.resources
+                      }} 
+                    />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
           {/* INSIGHTS TAB */}
           {activeTab === "insights" && (
             <>
