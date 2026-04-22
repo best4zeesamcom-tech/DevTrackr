@@ -84,6 +84,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       portfolioProjects: analysis.portfolioProjects,
       interviewTopics: analysis.interviewTopics,
       recommendedRoles: analysis.recommendedRoles,
+      userName: analysis.userName, 
     };
     
     localStorage.setItem("devtrackr_analysis", JSON.stringify(analysisData));
