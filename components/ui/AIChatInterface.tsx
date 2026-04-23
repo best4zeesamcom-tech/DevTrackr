@@ -73,7 +73,7 @@ Just type your question below! 👇`;
             currentSkills,
             missingSkills,
             recommendedRoles,
-            resumeText: resumeText.substring(0, 1500),
+            fullResumeText: resumeText,
           },
         }),
       });
@@ -127,25 +127,27 @@ Just type your question below! 👇`;
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="bg-gray-900 px-6 py-4">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      {/* Orange Header */}
+      <div className="bg-[#F97316] px-6 py-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
             <span className="text-white text-lg">🤖</span>
           </div>
           <div>
-            <h3 className="font-semibold text-white">AI Career Advisor</h3>
-            <p className="text-xs text-gray-400">Powered by Groq AI • Online</p>
+            <h3 className="font-semibold text-white">DevTrackr Assistant</h3>
+            <p className="text-xs text-white/70">Powered by Groq AI • Online</p>
           </div>
         </div>
       </div>
 
-      <div className="h-[500px] overflow-y-auto p-6 space-y-4 bg-gray-50">
+      {/* Chat Messages */}
+      <div className="h-[500px] overflow-y-auto p-6 space-y-4 bg-[#FFF7ED]">
         {messages.map((message) => (
           <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[85%] rounded-2xl p-4 ${
               message.role === "user"
-                ? "bg-gray-900 text-white"
+                ? "bg-[#F97316] text-white"
                 : "bg-white border border-gray-200 text-gray-900 shadow-sm"
             }`}>
               <div className="text-sm whitespace-pre-wrap leading-relaxed">
@@ -170,8 +172,9 @@ Just type your question below! 👇`;
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Job Button */}
       {showJobs && (
-        <div className="px-6 py-3 bg-blue-50 border-t border-blue-100">
+        <div className="px-6 py-3 bg-[#FDBA74] border-t border-gray-200">
           <button
             onClick={() => {
               if (jobs.length === 0) fetchJobs();
@@ -205,13 +208,14 @@ Just type your question below! 👇`;
               `;
               document.body.appendChild(modal);
             }}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2.5 rounded-lg font-medium hover:shadow-lg transition flex items-center justify-center gap-2"
+            className="w-full bg-[#F97316] text-white py-2.5 rounded-lg font-medium hover:bg-[#EA580C] transition flex items-center justify-center gap-2"
           >
             🔍 Find Jobs Matching Your Skills
           </button>
         </div>
       )}
 
+      {/* Chat Input */}
       <div className="border-t border-gray-200 p-4 bg-white">
         <div className="flex gap-2">
           <input
@@ -220,27 +224,27 @@ Just type your question below! 👇`;
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
             placeholder={`Ask me anything about your career, ${displayName}...`}
-            className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900"
+            className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F97316]"
           />
           <button
             onClick={handleSendMessage}
             disabled={loading || !input.trim()}
-            className="px-5 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 disabled:opacity-50 transition font-medium"
+            className="px-5 py-3 bg-[#F97316] text-white rounded-xl hover:bg-[#EA580C] disabled:opacity-50 transition font-medium"
           >
             Send
           </button>
         </div>
         <div className="mt-3 flex gap-2 flex-wrap">
-          <button onClick={() => setInput("What is my name?")} className="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition">
+          <button onClick={() => setInput("What is my name?")} className="text-xs px-3 py-1.5 bg-[#FFF7ED] text-gray-600 rounded-full hover:bg-[#FDBA74] hover:text-[#EA580C] transition">
             📝 What's my name?
           </button>
-          <button onClick={() => setInput("What skills do I have?")} className="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition">
+          <button onClick={() => setInput("What skills do I have?")} className="text-xs px-3 py-1.5 bg-[#FFF7ED] text-gray-600 rounded-full hover:bg-[#FDBA74] hover:text-[#EA580C] transition">
             ✅ My skills
           </button>
-          <button onClick={() => setInput("What should I learn next?")} className="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition">
+          <button onClick={() => setInput("What should I learn next?")} className="text-xs px-3 py-1.5 bg-[#FFF7ED] text-gray-600 rounded-full hover:bg-[#FDBA74] hover:text-[#EA580C] transition">
             📚 What to learn?
           </button>
-          <button onClick={() => setInput("Which companies are hiring for my skills?")} className="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition">
+          <button onClick={() => setInput("Which companies are hiring for my skills?")} className="text-xs px-3 py-1.5 bg-[#FFF7ED] text-gray-600 rounded-full hover:bg-[#FDBA74] hover:text-[#EA580C] transition">
             💼 Find jobs
           </button>
         </div>

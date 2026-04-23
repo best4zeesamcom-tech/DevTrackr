@@ -1,53 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #3B82F6;
-  --primary-dark: #2563EB;
-  --primary-light: #60A5FA;
-  --secondary: #6366F1;
-  --secondary-dark: #4F46E5;
-  --secondary-light: #818CF8;
-  --bg-light: #F8FAFC;
-  --bg-white: #FFFFFF;
-  --text-dark: #111827;
-  --text-light: #6B7280;
-  --border: #E2E8F0;
-  --gradient-primary: linear-gradient(135deg, #3B82F6 0%, #6366F1 100%);
+  --orange-main: #F97316;
+  --orange-soft: #FB923C;
+  --orange-light: #FDBA74;
+
+  --bg-light: #FFF7ED;
+
+  --text-active: #EA580C;
+  --text-inactive: #9CA3AF;
+
+  --white: #FFFFFF;
+  
+  --text-main: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6B7280;
+  --border: #E5E7EB;
+  --success: #22C55E;
+  --danger: #EF4444;
 }
 
 body {
-  background: var(--bg-light);
-  color: var(--text-dark);
+  background-color: var(--bg-light);
+  color: var(--text-main);
 }
 
-/* Custom Utilities */
-@utility gradient-primary {
-  background: linear-gradient(135deg, #3B82F6 0%, #6366F1 100%);
-}
-
-@utility card {
-  background: var(--bg-white);
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
-  padding: 1.5rem;
-}
-
-@utility btn-primary {
-  background: linear-gradient(135deg, #3B82F6 0%, #6366F1 100%);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-@utility input-focus {
-  outline: none;
-  ring: 2px solid #3B82F6;
-  ring-offset: 2px;
+/* Custom Utility Classes */
+@layer components {
+  .card {
+    background-color: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+  
+  .btn-primary {
+    background-color: var(--orange-main);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--text-active);
+  }
+  
+  .gradient-primary {
+    background: linear-gradient(135deg, var(--orange-main) 0%, var(--orange-soft) 100%);
+  }
 }

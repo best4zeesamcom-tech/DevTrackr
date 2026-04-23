@@ -5,36 +5,38 @@ export async function POST(req: NextRequest) {
     const { message, context } = await req.json();
     const apiKey = process.env.GROQ_API_KEY;
 
-    console.log("📨 Chat message:", message);
-    console.log("👤 User name from context:", context?.userName);
-
     const userName = context?.userName || "there";
+    const fullResumeText = context?.fullResumeText || "";
+    
+    console.log("📨 Chat message:", message);
+    console.log("👤 User name:", userName);
+    console.log("📄 Resume text length being sent:", fullResumeText?.length || 0);
 
     if (!apiKey) {
-      console.error("❌ GROQ_API_KEY not found");
       return NextResponse.json({ 
-        reply: `Hey ${userName}! I'm having trouble connecting to my AI. Please check your API key.` 
+        reply: `Hey ${userName}, I'm having trouble connecting. Please check your API key.` 
       });
     }
 
-    const prompt = `You are a friendly career advisor. The user's name is ${userName}.
+    // NEW PROMPT that includes FULL resume text
+    const prompt = `You are a career advisor. The user's name is ${userName}.
 
-USER'S SKILLS:
-- Current skills: ${context?.currentSkills?.join(", ") || "not specified"}
-- Skills to learn: ${context?.missingSkills?.slice(0, 5).join(", ") || "not specified"}
-- Target roles: ${context?.recommendedRoles?.join(", ") || "Developer"}
+HERE IS THE USER'S ACTUAL RESUME CONTENT:
+${fullResumeText.substring(0, 3000)}
 
-USER QUESTION: "${message}"
+USER'S QUESTION: "${message}"
 
 INSTRUCTIONS:
-1. ALWAYS address the user as ${userName} (this is their real name)
-2. Be specific to THEIR skills - mention their actual skills
-3. Give actionable, personalized advice
-4. Keep response under 150 words
+1. Answer questions based DIRECTLY on the resume content above
+2. If asked about education, look for schools, degrees, dates in the resume
+3. If asked about experience, look for companies, roles, dates
+4. If asked about name, use ${userName}
+5. Be specific - quote from their resume when possible
+6. If the information is not in the resume, say so honestly
 
-Respond in a warm, helpful tone.`;
+Answer in a helpful, friendly tone.`;
 
-    console.log("🤖 Sending to Groq API...");
+    console.log("🤖 Sending to Groq API with full resume context...");
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -47,36 +49,36 @@ Respond in a warm, helpful tone.`;
         messages: [
           {
             role: "system",
-            content: `You are a career advisor. The user's name is ${userName}. Always address them by name.`
+            content: `You are a career advisor. You have access to the user's full resume. Answer questions based on their actual resume content. Be specific and quote from their resume when possible.`
           },
           {
             role: "user",
             content: prompt
           }
         ],
-        temperature: 0.7,
-        max_tokens: 500
+        temperature: 0.5,
+        max_tokens: 800
       })
     });
 
     const data = await response.json();
     
     if (data.error) {
-      console.error("❌ Groq API Error:", data.error);
+      console.error("Groq API Error:", data.error);
       return NextResponse.json({ 
-        reply: `Hey ${userName}! I'm having trouble right now. Based on your resume, you have skills in ${context?.currentSkills?.slice(0, 3).join(", ") || "development"}. What specific help do you need?`
+        reply: `Hey ${userName}, I found this in your resume: ${fullResumeText.substring(0, 500)}... Based on that, what specific information are you looking for?`
       });
     }
 
-    const reply = data.choices[0]?.message?.content || `Hey ${userName}! How can I help you with your career today?`;
+    const reply = data.choices[0]?.message?.content || `I can see your resume shows experience with ${context?.currentSkills?.join(", ") || "various skills"}. What specific information would you like from it?`;
     console.log("✅ Groq reply sent");
     
     return NextResponse.json({ reply });
     
   } catch (error) {
-    console.error("❌ Chat error:", error);
+    console.error("Chat error:", error);
     return NextResponse.json({ 
-      reply: "I'm having trouble connecting. Please try again in a moment." 
+      reply: "I'm having trouble connecting. Please try again." 
     });
   }
 }
