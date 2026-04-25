@@ -1,3 +1,5 @@
+console.log("🔑 ENV CHECK - GROQ_API_KEY exists?", !!process.env.GROQ_API_KEY);
+console.log("🔑 ENV CHECK - First 5 chars:", process.env.GROQ_API_KEY?.substring(0, 5));
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
